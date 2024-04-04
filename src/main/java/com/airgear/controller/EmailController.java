@@ -11,6 +11,7 @@ package com.airgear.controller;
  * }
  */
 
+import com.airgear.model.email.CustomEmailStructure;
 import com.airgear.model.email.EmailsRequestStructure;
 import com.airgear.service.impl.EmailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -36,5 +37,10 @@ public class EmailController {
     @PostMapping("/send")
     public String sendEmail(@RequestBody EmailsRequestStructure request) {
         return emailService.sendMail(request.getEmailMessage(), request.getAddresses());
+    }
+
+    @PostMapping("/custom-message")
+    public String sendCustomEmail(@RequestBody CustomEmailStructure request) {
+        return emailService.sendCustomEmail(request);
     }
 }

@@ -1,11 +1,13 @@
 package com.airgear.service.impl;
 
 import com.airgear.model.User;
+import com.airgear.model.email.CustomEmailStructure;
 import com.airgear.model.email.EmailMessage;
 import com.airgear.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -64,6 +67,25 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Unable to send emails.");
         } finally {
             executorService.shutdown();
+        }
+    }
+
+    @Override
+    public String sendCustomEmail(CustomEmailStructure request) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(request.getTo());
+            helper.setSubject(request.getSubject());
+            helper.setText(request.getText());
+            FileSystemResource fileSystem = new FileSystemResource(new File(request.getAttachment()));
+            helper.addAttachment(fileSystem.getFilename(), fileSystem);
+
+            mailSender.send(message);
+            return "The email was sent successfully.";
+        } catch (MessagingException e) {
+            log.error("Unable to submit this email. ", e);
+            throw new RuntimeException("An error occurred while sending the email.", e);
         }
     }
 
