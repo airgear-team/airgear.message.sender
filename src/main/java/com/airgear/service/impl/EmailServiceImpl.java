@@ -1,8 +1,11 @@
 package com.airgear.service.impl;
 
+import com.airgear.dto.CustomEmailMessageDto;
+import com.airgear.dto.UserDto;
 import com.airgear.model.User;
-import com.airgear.model.email.CustomEmailStructure;
+import com.airgear.model.email.CustomEmailMessage;
 import com.airgear.model.email.EmailMessage;
+import com.airgear.repository.EmailMessageRepository;
 import com.airgear.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,6 +38,9 @@ public class EmailServiceImpl implements EmailService {
     // TODO refactoring the void sendWelcomeEmail(User user) method
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private EmailMessageRepository emailMessageRepository;
 
     @Override
     public String sendMail(EmailMessage emailMessage, Set<String> addresses) {
@@ -71,17 +79,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String sendCustomEmail(CustomEmailStructure request) {
+    public String sendCustomEmail(CustomEmailMessageDto request) {
         MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setTo(request.getTo());
+            helper.setTo(request.getRecipient());
             helper.setSubject(request.getSubject());
             helper.setText(request.getText());
             FileSystemResource fileSystem = new FileSystemResource(new File(request.getAttachment()));
             helper.addAttachment(fileSystem.getFilename(), fileSystem);
-
             mailSender.send(message);
+
+            log.info(this.save(request));
             return "The email was sent successfully.";
         } catch (MessagingException e) {
             log.error("Unable to submit this email. ", e);
@@ -89,7 +98,21 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    public void sendWelcomeEmail(User user) {
+
+    @Override
+    public String save(CustomEmailMessageDto message) {
+        CustomEmailMessage newMessage = message.toCustomEmailMessage();
+
+        try {
+            emailMessageRepository.save(newMessage);
+            return "The email was save successfully.";
+        } catch (RuntimeException e) {
+            log.error("Unable to save this email. ", e);
+            throw new RuntimeException("An error occurred while saving the email.", e);
+        }
+    }
+
+    public String sendWelcomeEmail(UserDto user) {
         String recipientAddress = user.getEmail();
         String username = user.getUsername();
 
@@ -108,6 +131,15 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+
+            CustomEmailMessageDto savingMessage = CustomEmailMessageDto.builder()
+                    .recipient(recipientAddress)
+                    .subject("Ласкаво просимо до нашого сервісу, " + username + "!")
+                    .text(htmlContent)
+                    .build();
+
+            log.info(this.save(savingMessage));
+            return "The welcome email was send successfully.";
         } catch (MessagingException e) {
             e.printStackTrace();
             throw new RuntimeException("An error occurred while sending the email", e);

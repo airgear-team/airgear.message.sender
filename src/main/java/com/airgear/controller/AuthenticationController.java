@@ -2,9 +2,7 @@ package com.airgear.controller;
 
 import com.airgear.dto.LoginUserDto;
 import com.airgear.exception.UserUniquenessViolationException;
-import com.airgear.exception.UserExceptions;
 import com.airgear.model.AuthToken;
-import com.airgear.model.ErrorResponse;
 import com.airgear.model.User;
 import com.airgear.security.TokenProvider;
 import com.airgear.service.EmailService;
@@ -19,13 +17,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/auth") // TODO використати класс шляхів Routes.AUTH
