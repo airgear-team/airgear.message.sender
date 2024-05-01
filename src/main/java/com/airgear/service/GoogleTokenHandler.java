@@ -1,17 +1,9 @@
 package com.airgear.service;
 
-import com.airgear.dto.LoginUserDto;
-import com.airgear.dto.UserDto;
+import com.airgear.dto.UserSaveRequest;
 
-/**
- * The {@link GoogleTokenHandler} for handling Google tokens.
- * <p>
- *
- * @author Oleksandr Tuleninov
- * @version 1.0
- */
 public interface GoogleTokenHandler {
 
-    LoginUserDto execute(String token);
+    UserSaveRequest execute(String token);
 
 }

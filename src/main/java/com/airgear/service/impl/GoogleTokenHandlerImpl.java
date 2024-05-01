@@ -1,11 +1,11 @@
 package com.airgear.service.impl;
 
-import com.airgear.dto.LoginUserDto;
+import com.airgear.dto.UserSaveRequest;
 import com.airgear.dto.TokenResponse;
-import com.airgear.dto.UserDto;
 import com.airgear.service.GoogleTokenHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,19 +17,9 @@ import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Implementation of {@link GoogleTokenHandler} for handling Google tokens.
- *
- * <p>This service interacts with Google's token validation endpoint to validate and retrieve information
- * from a Google token. The extracted information is then used to create a {@link UserDto}.</p>
- *
- * <p>Configuration properties are used for the validation URL and default password.</p>
- *
- * @author Oleksandr Tuleninov
- * @version 1.0
- */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GoogleTokenHandlerImpl implements GoogleTokenHandler {
 
     @Value("${validation.google.url}")
@@ -40,25 +30,17 @@ public class GoogleTokenHandlerImpl implements GoogleTokenHandler {
 
     private final ObjectMapper objectMapper;
 
-    public GoogleTokenHandlerImpl(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    /**
-     * Executes the handling of a Google token.
-     *
-     * @param token The Google token to be handled.
-     * @return User information extracted from the token.
-     */
     @Override
-    public LoginUserDto execute(String token) {
+    public UserSaveRequest execute(String token) {
         String tokenUrl = thirdPartyUrl + token;
 
         TokenResponse tokenResponse = getTokenResponse(tokenUrl);
 
-        return new LoginUserDto(
-                tokenResponse.sub(),
-                defaultPassword);
+        return new UserSaveRequest(
+                tokenResponse.getSub(),
+                defaultPassword,
+                null,
+                tokenResponse.getName());
     }
 
     private TokenResponse getTokenResponse(String validationUrl) {
