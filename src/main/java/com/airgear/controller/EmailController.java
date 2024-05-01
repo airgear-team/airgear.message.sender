@@ -12,8 +12,7 @@ package com.airgear.controller;
  */
 
 import com.airgear.dto.CustomEmailMessageDto;
-import com.airgear.dto.UserDto;
-import com.airgear.model.email.CustomEmailMessage;
+import com.airgear.dto.UserGetResponse;
 import com.airgear.model.email.EmailsRequestStructure;
 import com.airgear.service.impl.EmailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ public class EmailController {
     }
 
     @PostMapping("/welcome-message")
-    public String sendWelcomeEmail(@RequestBody UserDto user) {
+    public String sendWelcomeEmail(@RequestBody UserGetResponse user) {
         return emailService.sendWelcomeEmail(user);
     }
 

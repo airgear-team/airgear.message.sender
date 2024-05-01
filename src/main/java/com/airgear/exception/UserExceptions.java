@@ -3,25 +3,26 @@ package com.airgear.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Utility class for creating custom exceptions related to users.
- * <p>
- *
- * @author Oleksandr Tuleninov
- * @version 01
- */
 public class UserExceptions {
 
-    public UserExceptions() {
-    }
-
-    /**
-     * Throws a ResponseStatusException for a not found user.
-     *
-     * @param userId The ID of the user that was not found.
-     * @return ResponseStatusException with a NOT_FOUND status and a descriptive message.
-     */
-    public static ResponseStatusException userNotFound(long userId) {
+    public static ResponseStatusException userNotFound(Long userId) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id '" + userId + "' was not found");
     }
+
+    public static ResponseStatusException userNotFound(String email) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with email '" + email + "' was not found");
+    }
+
+    public static ResponseStatusException duplicateEmail(String email) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email " + email + " already taken");
+    }
+
+    public static ResponseStatusException duplicatePhone(String phone) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone " + phone + " already taken");
+    }
+
+    public static ResponseStatusException AccessDenied(String name) {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: " + name);
+    }
+
 }

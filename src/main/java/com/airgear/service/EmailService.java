@@ -1,9 +1,7 @@
 package com.airgear.service;
 
 import com.airgear.dto.CustomEmailMessageDto;
-import com.airgear.dto.UserDto;
-import com.airgear.model.User;
-import com.airgear.model.email.CustomEmailMessage;
+import com.airgear.dto.UserGetResponse;
 import com.airgear.model.email.EmailMessage;
 
 import java.util.Set;
@@ -11,7 +9,7 @@ import java.util.Set;
 public interface EmailService {
     String sendMail(EmailMessage emailMessage, Set<String> addresses);
 
-    public String  sendWelcomeEmail(UserDto user);
+    public String  sendWelcomeEmail(UserGetResponse user);
 
 
     String sendCustomEmail(CustomEmailMessageDto request);

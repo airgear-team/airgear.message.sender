@@ -1,74 +1,58 @@
 package com.airgear.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.airgear.dto.SignInRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
-@Slf4j
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    @Value("${jwt.header.string}")
-    public String HEADER_STRING;
+    private final ObjectMapper objectMapper;
 
-    @Value("${jwt.token.prefix}")
-    public String TOKEN_PREFIX;
-
-    @Resource(name = "userService")
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private TokenProvider jwtTokenUtil;
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager,
+                                   ObjectMapper objectMapper) {
+        setAuthenticationManager(authenticationManager);
+        setUsernameParameter("login");
+        this.objectMapper = objectMapper;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(HEADER_STRING);
-        String username = null;
-        String authToken = null;
-
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            authToken = header.replace(TOKEN_PREFIX, "");
-
-            try {
-                username = jwtTokenUtil.getUsernameFromToken(authToken);
-                log.info("User name : {}", username);
-            } catch (IllegalArgumentException e) {
-                log.error("Error occurred while retrieving Username from Token", e);
-            } catch (ExpiredJwtException e) {
-                log.warn("The token has expired", e);
-            } catch (SignatureException e) {
-                log.error("Authentication Failed. Invalid username or password.");
-            }
-        } else {
-            log.warn("Bearer string not found, ignoring the header");
+    public Authentication attemptAuthentication(HttpServletRequest req,
+                                                HttpServletResponse res) throws AuthenticationException {
+        SignInRequest credentials;
+        try {
+            credentials = objectMapper.readValue(req.getInputStream(), SignInRequest.class);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        var authToken = new UsernamePasswordAuthenticationToken(
+                credentials.getLogin(),
+                credentials.getPassword()
+        );
 
-            if (jwtTokenUtil.validateToken(authToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthenticationToken(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                log.info("User authenticated: " + username + ", setting security context");
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
+        return getAuthenticationManager().authenticate(authToken);
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest req,
+                                            HttpServletResponse res,
+                                            FilterChain chain,
+                                            Authentication auth) throws IOException, ServletException {
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         chain.doFilter(req, res);
     }
-
 }

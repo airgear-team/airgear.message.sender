@@ -1,8 +1,7 @@
 package com.airgear.service.impl;
 
 import com.airgear.dto.CustomEmailMessageDto;
-import com.airgear.dto.UserDto;
-import com.airgear.model.User;
+import com.airgear.dto.UserGetResponse;
 import com.airgear.model.email.CustomEmailMessage;
 import com.airgear.model.email.EmailMessage;
 import com.airgear.repository.EmailMessageRepository;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -112,19 +109,19 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    public String sendWelcomeEmail(UserDto user) {
+    public String sendWelcomeEmail(UserGetResponse user) {
         String recipientAddress = user.getEmail();
-        String username = user.getUsername();
+//        String username = user.getUsername();
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = null;
         try {
             helper = new MimeMessageHelper(message, true);
             helper.setTo(recipientAddress);
-            helper.setSubject("Ласкаво просимо до нашого сервісу, " + username + "!");
+            helper.setSubject("Ласкаво просимо до нашого сервісу, " + recipientAddress + "!");
 
             String htmlContent = "<html><body>"
-                    + "<h1>Ласкаво просимо до нашого сервісу, " + username + "!</h1>"
+                    + "<h1>Ласкаво просимо до нашого сервісу, " + recipientAddress + "!</h1>"
                     + "<p>Дякуємо за реєстрацію на нашому сервісі. Ми раді, що ви обрали нас.</p>"
                     + "</body></html>";
 
@@ -134,7 +131,7 @@ public class EmailServiceImpl implements EmailService {
 
             CustomEmailMessageDto savingMessage = CustomEmailMessageDto.builder()
                     .recipient(recipientAddress)
-                    .subject("Ласкаво просимо до нашого сервісу, " + username + "!")
+                    .subject("Ласкаво просимо до нашого сервісу, " + recipientAddress + "!")
                     .text(htmlContent)
                     .build();
 
