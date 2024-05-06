@@ -17,7 +17,4 @@ public interface UserRepository extends CrudRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByPhone(String phone);
-
-    @Query("Select fg FROM User user join  user.favoriteGoods fg where user.id = :userId")
-    Set<Goods> getFavoriteGoodsByUser(Long userId);
 }

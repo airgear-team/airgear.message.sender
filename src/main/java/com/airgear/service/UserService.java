@@ -12,6 +12,4 @@ public interface UserService {
 
     UserGetResponse getUserByEmail(String email);
 
-    Set<GoodsSearchResponse> getFavoriteGoods(String email);
-
 }

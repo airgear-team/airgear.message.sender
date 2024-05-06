@@ -56,12 +56,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         return userMapper.toDto(user);
     }
 
-    @Override
-    public Set<GoodsSearchResponse> getFavoriteGoods(String email) {
-        User user = getUser(email);
-        return goodsMapper.toSearchResponse(userRepository.getFavoriteGoodsByUser(user.getId()));
-    }
-
     private void validateUniqueFields(UserSaveRequest request) {
         String email = request.getEmail();
         if (userRepository.existsByEmail(email)) {
