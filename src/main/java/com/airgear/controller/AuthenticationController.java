@@ -1,20 +1,14 @@
 package com.airgear.controller;
 
 import com.airgear.dto.SignInRequest;
-import com.airgear.dto.UserSaveRequest;
 import com.airgear.entity.AuthToken;
 import com.airgear.model.CustomUserDetails;
 import com.airgear.security.TokenProvider;
-import com.airgear.service.ThirdPartyTokenHandler;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,7 +16,6 @@ import javax.validation.Valid;
 public class AuthenticationController {
 
     private final TokenProvider jwtTokenUtil;
-//    private final ThirdPartyTokenHandler tokenHandler;
 
     @PostMapping(value = "/authenticate")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -31,15 +24,4 @@ public class AuthenticationController {
         return jwtTokenUtil.generateToken(userDetails);
     }
 
-//
-//    @PostMapping(value = "/register")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public AuthToken register(@RequestBody @Valid UserSaveRequest request) {
-//        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
-//    }
-//
-//    @GetMapping(value = "/service")
-//    public AuthToken generateTokenFromThirdPartyService(HttpServletRequest request) {
-//        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
-//    }
 }

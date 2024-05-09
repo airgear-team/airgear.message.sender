@@ -21,10 +21,8 @@ public class UserGetRequest {
     private String phone;
     private String name;
     private Set<Role> roles;
-//    private Set<GoodsGetRequest> goods;
     private OffsetDateTime createdAt;
     private OffsetDateTime deleteAt;
     private UserStatus status;
-    private Set<UserReviewGetRequest> userReviews;
 
 }

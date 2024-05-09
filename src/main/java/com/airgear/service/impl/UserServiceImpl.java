@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-//    private final GoodsMapper goodsMapper;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -39,43 +38,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         User user = getUser(email);
         return userMapper.toDto(user);
     }
-
-//    @Override
-//    public UserGetResponse create(UserSaveRequest request) {
-//        validateUniqueFields(request);
-//        User user = save(request);
-//        return userMapper.toDto(user);
-//    }
-
-//    private void validateUniqueFields(UserSaveRequest request) {
-//        String email = request.getEmail();
-//        if (userRepository.existsByEmail(email)) {
-//            throw UserExceptions.duplicateEmail(email);
-//        }
-//        String phone = request.getPhone();
-//        if (userRepository.existsByPhone(phone)) {
-//            throw UserExceptions.duplicatePhone(phone);
-//        }
-//    }
-
-//    private User save(UserSaveRequest request) {
-//        var user = new User();
-//        user.setEmail(request.getEmail());
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setPhone(request.getPhone());
-//        user.setName(request.getName());
-//        user.setRoles(createRoles());
-//        user.setStatus(UserStatus.ACTIVE);
-//        user.setCreatedAt(OffsetDateTime.now());
-//        userRepository.save(user);
-//        return user;
-//    }
-//
-//    private Set<Role> createRoles() {
-//        Set<Role> roles = new HashSet<>();
-//        roles.add(Role.USER);
-//        return roles;
-//    }
 
     private User getUser(String email) {
         return userRepository.findByEmail(email)

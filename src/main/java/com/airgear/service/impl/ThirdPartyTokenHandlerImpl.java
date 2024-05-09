@@ -4,7 +4,6 @@ import com.airgear.dto.UserSaveRequest;
 import com.airgear.model.CustomUserDetails;
 import com.airgear.service.ThirdPartyDataHandler;
 import com.airgear.service.ThirdPartyTokenHandler;
-import com.airgear.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,14 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ThirdPartyTokenHandlerImpl implements ThirdPartyTokenHandler {
 
     private final ThirdPartyDataHandler thirdPartyDataHandler;
-//    private final UserService userService;
     private final AuthenticationManager authenticationManager;
-
-//    @Override
-//    public CustomUserDetails execute(UserSaveRequest request) {
-//        userService.create(request);
-//        return getCustomUserDetails(request);
-//    }
 
     @Override
     public CustomUserDetails execute(HttpServletRequest request) {
