@@ -21,10 +21,8 @@ public class UserGetResponse {
     private String phone;
     private String name;
     private Set<Role> roles;
-    private Set<GoodsGetResponse> goods;
     private OffsetDateTime createdAt;
     private OffsetDateTime deleteAt;
     private UserStatus status;
-    private Set<UserReviewGetResponse> userReviews;
 
 }
