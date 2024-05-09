@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface ThirdPartyTokenHandler {
 
-    CustomUserDetails execute(UserSaveRequest request);
+//    CustomUserDetails execute(UserSaveRequest request);
 
     CustomUserDetails execute(HttpServletRequest request);
 

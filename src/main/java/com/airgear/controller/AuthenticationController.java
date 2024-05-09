@@ -22,7 +22,7 @@ import javax.validation.Valid;
 public class AuthenticationController {
 
     private final TokenProvider jwtTokenUtil;
-    private final ThirdPartyTokenHandler tokenHandler;
+//    private final ThirdPartyTokenHandler tokenHandler;
 
     @PostMapping(value = "/authenticate")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -31,14 +31,15 @@ public class AuthenticationController {
         return jwtTokenUtil.generateToken(userDetails);
     }
 
-    @PostMapping(value = "/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AuthToken register(@RequestBody @Valid UserSaveRequest request) {
-        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
-    }
-
-    @GetMapping(value = "/service")
-    public AuthToken generateTokenFromThirdPartyService(HttpServletRequest request) {
-        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
-    }
+//
+//    @PostMapping(value = "/register")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public AuthToken register(@RequestBody @Valid UserSaveRequest request) {
+//        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
+//    }
+//
+//    @GetMapping(value = "/service")
+//    public AuthToken generateTokenFromThirdPartyService(HttpServletRequest request) {
+//        return jwtTokenUtil.generateToken(tokenHandler.execute(request));
+//    }
 }

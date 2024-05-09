@@ -19,14 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 public class ThirdPartyTokenHandlerImpl implements ThirdPartyTokenHandler {
 
     private final ThirdPartyDataHandler thirdPartyDataHandler;
-    private final UserService userService;
+//    private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
-    @Override
-    public CustomUserDetails execute(UserSaveRequest request) {
-        userService.create(request);
-        return getCustomUserDetails(request);
-    }
+//    @Override
+//    public CustomUserDetails execute(UserSaveRequest request) {
+//        userService.create(request);
+//        return getCustomUserDetails(request);
+//    }
 
     @Override
     public CustomUserDetails execute(HttpServletRequest request) {
