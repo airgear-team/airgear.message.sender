@@ -2,7 +2,7 @@ package com.airgear.service;
 
 import com.airgear.dto.CustomEmailMessageDto;
 import com.airgear.dto.UserGetResponse;
-import com.airgear.model.email.EmailMessage;
+import com.airgear.entity.EmailMessage;
 
 import java.util.Set;
 

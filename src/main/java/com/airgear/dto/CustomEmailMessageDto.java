@@ -1,6 +1,6 @@
 package com.airgear.dto;
 
-import com.airgear.model.email.CustomEmailMessage;
+import com.airgear.entity.CustomEmailMessage;
 import lombok.Builder;
 import lombok.Data;
 
