@@ -2,8 +2,8 @@ package com.airgear.service.impl;
 
 import com.airgear.dto.CustomEmailMessageDto;
 import com.airgear.dto.UserGetResponse;
-import com.airgear.model.email.CustomEmailMessage;
-import com.airgear.model.email.EmailMessage;
+import com.airgear.entity.CustomEmailMessage;
+import com.airgear.entity.EmailMessage;
 import com.airgear.repository.EmailMessageRepository;
 import com.airgear.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
