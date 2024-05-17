@@ -14,10 +14,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -140,6 +143,16 @@ public class EmailServiceImpl implements EmailService {
         } catch (MessagingException e) {
             e.printStackTrace();
             throw new RuntimeException("An error occurred while sending the email", e);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CustomEmailMessage> filterByEmail(String email) {
+        try {
+           return (List<CustomEmailMessage>) emailMessageRepository.findAllByRecipient(email);
+        } catch (Exception e) {
+            throw new RuntimeException("Not found such emails");
         }
     }
 }

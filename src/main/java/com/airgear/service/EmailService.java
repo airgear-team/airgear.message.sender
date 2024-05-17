@@ -2,8 +2,11 @@ package com.airgear.service;
 
 import com.airgear.dto.CustomEmailMessageDto;
 import com.airgear.dto.UserGetResponse;
+import com.airgear.entity.CustomEmailMessage;
 import com.airgear.entity.EmailMessage;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface EmailService {
@@ -15,4 +18,6 @@ public interface EmailService {
     String sendCustomEmail(CustomEmailMessageDto request);
 
     public String  save(CustomEmailMessageDto message);
+
+    List<CustomEmailMessage> filterByEmail(String email);
 }
