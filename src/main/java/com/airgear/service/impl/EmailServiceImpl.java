@@ -7,9 +7,12 @@ import com.airgear.entity.EmailMessage;
 import com.airgear.repository.EmailMessageRepository;
 import com.airgear.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,12 +23,14 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+// TODO custom Exceptions
+// TODO refactoring the void sendWelcomeEmail(User user) method
 
 @Slf4j
 @Service
@@ -33,14 +38,13 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${spring.mail.username}")
     private String fromMail;
-    // TODO to use constructor with arguments
-    // TODO custom Exceptions
-    // TODO refactoring the void sendWelcomeEmail(User user) method
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+    private final EmailMessageRepository emailMessageRepository;
 
-    @Autowired
-    private EmailMessageRepository emailMessageRepository;
+    public EmailServiceImpl(JavaMailSender mailSender, EmailMessageRepository emailMessageRepository) {
+        this.mailSender = mailSender;
+        this.emailMessageRepository = emailMessageRepository;
+    }
 
     @Override
     public String sendMail(EmailMessage emailMessage, Set<String> addresses) {
@@ -114,7 +118,6 @@ public class EmailServiceImpl implements EmailService {
 
     public String sendWelcomeEmail(UserGetResponse user) {
         String recipientAddress = user.getEmail();
-//        String username = user.getUsername();
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = null;
@@ -150,9 +153,26 @@ public class EmailServiceImpl implements EmailService {
     @Transactional(readOnly = true)
     public List<CustomEmailMessage> filterByEmail(String email) {
         try {
-           return (List<CustomEmailMessage>) emailMessageRepository.findAllByRecipient(email);
+            return emailMessageRepository.findAllByRecipient(email);
         } catch (Exception e) {
             throw new RuntimeException("Not found such emails");
         }
     }
+
+    @Override
+    public Page<CustomEmailMessage> filterByEmailWithPagination(String email, int page, int size) {
+        Pageable pageRequest = createPageRequestUsing(page, size);
+
+        List<CustomEmailMessage> allFilteredMessages = filterByEmail(email);
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), allFilteredMessages.size());
+
+        List<CustomEmailMessage> pageContent = allFilteredMessages.subList(start, end);
+        return new PageImpl<>(pageContent, pageRequest, allFilteredMessages.size());
+    }
+
+    private Pageable createPageRequestUsing(int page, int size) {
+        return PageRequest.of(page, size);
+    }
+
 }

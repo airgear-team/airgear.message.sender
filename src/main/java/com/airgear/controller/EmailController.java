@@ -7,19 +7,19 @@ import com.airgear.entity.EmailsRequestStructure;
 import com.airgear.service.impl.EmailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/mail")
 public class EmailController {
 
-    private EmailServiceImpl emailService;
+    private final EmailServiceImpl emailService;
 
     @Autowired
     public EmailController(EmailServiceImpl emailService){
@@ -49,5 +49,20 @@ public class EmailController {
     @GetMapping("/filter-by-email/")
     public ResponseEntity<List<CustomEmailMessage>> filterByEmail(@RequestParam String email) {
         return ResponseEntity.ok(emailService.filterByEmail(email));
+    }
+
+    @GetMapping("/filter-with-pagination")
+    public ResponseEntity<Page<CustomEmailMessage>> filterWithPagination(
+            @RequestParam String email,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Page<CustomEmailMessage> messagePage = emailService.filterByEmailWithPagination(email, page, size);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Page-Number", String.valueOf(messagePage.getNumber()));
+        headers.add("X-Page-Size", String.valueOf(messagePage.getSize()));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(messagePage);
     }
 }
