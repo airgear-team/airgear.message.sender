@@ -4,6 +4,8 @@ import com.airgear.dto.CustomEmailMessageDto;
 import com.airgear.dto.UserGetResponse;
 import com.airgear.entity.CustomEmailMessage;
 import com.airgear.entity.EmailMessage;
+import com.airgear.exception.EmailExceptions;
+import com.airgear.exception.UserExceptions;
 import com.airgear.repository.EmailMessageRepository;
 import com.airgear.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 // TODO custom Exceptions
 // TODO refactoring the void sendWelcomeEmail(User user) method
@@ -76,7 +81,8 @@ public class EmailServiceImpl implements EmailService {
         } catch (Exception e) {
             log.error("Unable to submit emails for sending.", e);
             //TODO save unsent emails
-            throw new RuntimeException("Unable to send emails.");
+//            throw new RuntimeException("Unable to send emails.");
+            throw  EmailExceptions.unableToSendEmail();
         } finally {
             executorService.shutdown();
         }
@@ -98,7 +104,8 @@ public class EmailServiceImpl implements EmailService {
             return "The email was sent successfully.";
         } catch (MessagingException e) {
             log.error("Unable to submit this email. ", e);
-            throw new RuntimeException("An error occurred while sending the email.", e);
+//            throw new RuntimeException("An error occurred while sending the email.", e);
+            throw  EmailExceptions.unableToSendEmail();
         }
     }
 
@@ -112,7 +119,8 @@ public class EmailServiceImpl implements EmailService {
             return "The email was save successfully.";
         } catch (RuntimeException e) {
             log.error("Unable to save this email. ", e);
-            throw new RuntimeException("An error occurred while saving the email.", e);
+//            throw new RuntimeException("An error occurred while saving the email.", e);
+            throw EmailExceptions.unableToSaveEmail();
         }
     }
 
@@ -145,19 +153,28 @@ public class EmailServiceImpl implements EmailService {
             return "The welcome email was send successfully.";
         } catch (MessagingException e) {
             e.printStackTrace();
-            throw new RuntimeException("An error occurred while sending the email", e);
+//            throw new RuntimeException("An error occurred while sending the email", e);
+            throw  EmailExceptions.unableToSendEmail();
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CustomEmailMessage> filterByEmail(String email) {
-        try {
-            return emailMessageRepository.findAllByRecipient(email);
-        } catch (Exception e) {
-            throw new RuntimeException("Not found such emails");
-        }
+        List<CustomEmailMessage> messages = Optional.ofNullable(emailMessageRepository.findAllByRecipient(email))
+                .filter(msgList -> !msgList.isEmpty())
+                .orElseThrow(EmailExceptions::notFoundEmails);
+        return messages;
     }
+
+//    @Transactional(readOnly = true)
+//    public List<CustomEmailMessage> filterByEmail(String email) {
+//        try {
+//            return emailMessageRepository.findAllByRecipient(email);
+//        } catch (RuntimeException e) {
+//           throw EmailExceptions.notFoundEmails();
+//        }
+//    }
 
     @Override
     public Page<CustomEmailMessage> filterByEmailWithPagination(String email, int page, int size) {
